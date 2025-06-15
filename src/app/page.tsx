@@ -1,72 +1,59 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { usePrivy } from '@privy-io/react-auth';
+import Navbar from '../components/Navbar';
+import Hero from '../components/Hero';
+import Statistics from '../components/Statistics';
+import Technology from '../components/Technology';
+import Features from '../components/Features';
+import Roadmap from '../components/Roadmap';
+import Team from '../components/Team';
+import Newsletter from '../components/Newsletter';
+import Footer from '../components/Footer';
+import LoginModal from '../components/LoginModal';
 
-export default function LoginWithPrivy() {
+export default function Home() {
   const { ready, authenticated, user, login, logout } = usePrivy();
+  const [scrollY, setScrollY] = useState(0);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
 
-  // Show loading state while Privy initializes
-  if (!ready) {
-    return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-900">
-        <div className="bg-gray-800 p-6 rounded-lg">
-          <div className="w-8 h-8 border-2 border-gray-600 border-t-white rounded-full animate-spin mx-auto"></div>
-          <p className="text-center mt-3 text-gray-300">Loading...</p>
-        </div>
-      </div>
-    );
-  }
+  useEffect(() => {
+    const handleScroll = () => setScrollY(window.scrollY);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
-  // Show user info if authenticated
-  if (authenticated) {
-    return (
-      <div className="min-h-screen bg-gray-900 p-8">
-        <div className="max-w-md mx-auto bg-gray-800 rounded-lg p-6">
-          <h1 className="text-xl font-semibold text-white mb-4">Welcome Back</h1>
-          
-          <div className="mb-6">
-            <p className="text-gray-300 text-sm">User ID:</p>
-            <p className="text-gray-100 text-xs font-mono break-all">{user?.id}</p>
-          </div>
-
-          {user?.email && (
-            <div className="mb-6">
-              <p className="text-gray-300 text-sm">Email:</p>
-              <p className="text-gray-100">{user.email.address}</p>
-            </div>
-          )}
-
-          {user?.wallet && (
-            <div className="mb-6">
-              <p className="text-gray-300 text-sm">Wallet:</p>
-              <p className="text-gray-100 text-xs font-mono break-all">{user.wallet.address}</p>
-            </div>
-          )}
-
-          <button 
-            onClick={logout}
-            className="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded transition-colors"
-          >
-            Logout
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // Show login modal
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-      <div className="bg-gray-800 rounded-lg p-6 w-full max-w-sm">
-        <h1 className="text-xl font-semibold text-white mb-6 text-center">Sign In</h1>
-        
-        <button
-          onClick={login}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded transition-colors"
-        >
-          Sign In with Privy
-        </button>
-      </div>
+    <div className="min-h-screen bg-gray-950 text-white">
+      {ready ? (
+        <>
+          <Navbar 
+            user={user} 
+            logout={logout} 
+            authenticated={authenticated} 
+            openLogin={() => setIsLoginOpen(true)}
+          />
+          <Hero scrollY={scrollY} />
+          <Statistics />
+          <Technology />
+          <Features />
+          <Roadmap />
+          <Team />
+          <Newsletter />
+          <Footer />
+          {isLoginOpen && !authenticated && (
+            <LoginModal onClose={() => setIsLoginOpen(false)} login={login} />
+          )}
+        </>
+      ) : (
+        <div className="flex min-h-screen items-center justify-center bg-gray-950">
+          <div className="rounded-lg bg-gray-800 p-6">
+            <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-t-white border-gray-600"></div>
+            <p className="mt-3 text-center text-gray-300">Loading...</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
