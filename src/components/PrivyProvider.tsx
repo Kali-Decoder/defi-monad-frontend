@@ -1,24 +1,19 @@
 'use client';
 
-import {PrivyProvider} from '@privy-io/react-auth';
-import { monadTestnet } from "viem/chains";
+import { PrivyProvider } from '@privy-io/react-auth';
 
-export default function Providers({children}: {children: React.ReactNode}) {
+export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <PrivyProvider
-    appId={process.env.NEXT_PUBLIC_APP_ID!}
-    config={{
+      appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID || ''}
+      config={{
+        loginMethods: ['email', 'wallet', 'google', 'twitter', 'github'],
         appearance: {
-            theme: "light",
-            walletChainType: "ethereum-only",
+          theme: 'dark',
+          accentColor: '#3B82F6',
+          logo: '/logo.png',
         },
-        defaultChain: monadTestnet,
-        supportedChains: [monadTestnet],
-        loginMethods: ["google", "passkey", "wallet"],
-        embeddedWallets: {
-            ethereum: { createOnLogin: "all-users" },
-        },
-    }}
+      }}
     >
       {children}
     </PrivyProvider>
